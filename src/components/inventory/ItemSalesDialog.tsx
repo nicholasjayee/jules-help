@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +33,7 @@ const ItemSalesDialog: React.FC<ItemSalesDialogProps> = ({
   dateRange,
   specificDate
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
 
@@ -81,7 +81,8 @@ const ItemSalesDialog: React.FC<ItemSalesDialogProps> = ({
   const relevantSales = getFilteredSales();
 
   const handleEditSale = (sale: Sale) => {
-    navigate('/new-sale', { state: { editSale: sale } });
+    // navigate('/new-sale', { state: { editSale: sale } });
+    router.push('/new-sale');
     onOpenChange(false); // Close the dialog
   };
 

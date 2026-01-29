@@ -1,4 +1,4 @@
-
+"use client";
 import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProducts } from '@/hooks/useProducts';
@@ -54,7 +54,7 @@ export const useBulkProducts = () => {
 
     try {
       // Extract all categories from products
-      const productCategories = products.map(p => p.category).filter(Boolean);
+      const productCategories = products.map(p => p.category).filter((c): c is string => !!c);
       
       // Create missing categories first
       if (productCategories.length > 0) {
@@ -110,9 +110,9 @@ export const useBulkProducts = () => {
     }
   };
 
-  const detectNewCategories = (products: ProductFormData[]) => {
+  const detectNewCategories = (products: ProductFormData[]): string[] => {
     const existingCategoryNames = categories.map(cat => cat.name.toLowerCase());
-    const productCategories = products.map(p => p.category).filter(Boolean);
+    const productCategories = products.map(p => p.category).filter((c): c is string => !!c);
     const uniqueCategories = [...new Set(productCategories)];
     
     return uniqueCategories.filter(

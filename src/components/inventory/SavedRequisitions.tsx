@@ -164,7 +164,7 @@ const SavedRequisitions = ({
       await generateAlternativePDF(requisition, businessName);
       console.log('PDF generated successfully using alternative method');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('PDF generation failed:', error);
       console.error('Error message:', error.message);
       console.error('Error stack:', error.stack);
@@ -310,8 +310,8 @@ const SavedRequisitions = ({
                 </TableHeader>
                 <TableBody>
                   {paginatedItems.map(requisition => {
-                    const totalQuantity = requisition.items.reduce((sum, item) => sum + item.quantity, 0);
-                    const urgentItems = requisition.items.filter(item => item.urgentItem).length;
+                    const totalQuantity = requisition.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
+                    const urgentItems = requisition.items.filter((item: any) => item.urgentItem).length;
                     
                     return (
                       <TableRow key={requisition.id}>

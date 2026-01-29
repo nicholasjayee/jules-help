@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
 import EditStockHistoryDialog from './EditStockHistoryDialog';
 import DeleteStockHistoryDialog from './DeleteStockHistoryDialog';
 

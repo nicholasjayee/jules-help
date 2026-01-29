@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MobileProductCard from './MobileProductCard';
@@ -39,7 +39,7 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
   onUpdateProduct,
   categories = []
 }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const isMobile = useIsMobile();
   
   // Internal sorting state (fallback if no external sorting is provided)
@@ -51,11 +51,11 @@ const InventoryTable: React.FC<InventoryTableProps> = ({
   const sortOrder = externalSortOrder || internalSortOrder;
 
   const handleEdit = (id: string) => {
-    navigate(`/inventory/edit/${id}`);
+    router.push(`/inventory/edit/${id}`);
   };
 
   const handleView = (id: string) => {
-    navigate(`/inventory/${id}`);
+    router.push(`/inventory/${id}`);
   };
 
   const handleSort = (field: SortField) => {

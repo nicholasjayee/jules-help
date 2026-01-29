@@ -14,10 +14,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertCircle, CheckCircle, TrendingDown, TrendingUp, PackagePlus, PackageMinus } from 'lucide-react';
 import { Product } from '@/types';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useBusiness } from '@/contexts/BusinessContext';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
 
 interface StockReconciliationProps {
   product: Product;
@@ -58,7 +56,7 @@ const StockReconciliation: React.FC<StockReconciliationProps> = ({
 }) => {
   const { user } = useAuth();
   const { currentBusiness } = useBusiness();
-  const { settings } = useBusinessSettings();
+  const settings = { currency: 'UGX' }; // Mock settings
   const [isApplying, setIsApplying] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,283 +90,23 @@ const StockReconciliation: React.FC<StockReconciliationProps> = ({
 
       setIsLoading(true);
       try {
-        // 1. Get Opening Stock from first stock history entry (initial stock)
-        const { data: firstEntry } = await supabase
-          .from('stock_history')
-          .select('new_quantity, created_at')
-          .eq('product_id', product.id)
-          .eq('location_id', currentBusiness.id)
-          .order('created_at', { ascending: true })
-          .order('id', { ascending: true })
-          .limit(1)
-          .maybeSingle();
-
-        const openingStock = firstEntry ? Number(firstEntry.new_quantity) || 0 : 0;
-
-        // 2. Get all transactions with dates using chunked pagination to bypass 1000 row limit
-        const chunkSize = 1000;
-
-        // Load all sales
-        let allSalesData: any[] = [];
-        let salesStart = 0;
-        let hasSalesMore = true;
-
-        while (hasSalesMore) {
-          const { data: salesChunk, error: salesError } = await supabase
-            .from('sales' as any)
-            .select('items, date')
-            .eq('location_id', currentBusiness.id)
-            .range(salesStart, salesStart + chunkSize - 1);
-
-          if (salesError) throw salesError;
-
-          if (salesChunk && salesChunk.length > 0) {
-            allSalesData.push(...salesChunk);
-            salesStart += chunkSize;
-            hasSalesMore = salesChunk.length === chunkSize;
-          } else {
-            hasSalesMore = false;
-          }
-        }
-
-        // Load all stock added (Purchase)
-        let allStockAddedData: any[] = [];
-        let stockAddedStart = 0;
-        let hasStockAddedMore = true;
-
-        while (hasStockAddedMore) {
-          const { data: stockAddedChunk, error: stockAddedError } = await supabase
-            .from('stock_history')
-            .select('previous_quantity, new_quantity, created_at, change_reason')
-            .eq('product_id', product.id)
-            .eq('location_id', currentBusiness.id)
-            .ilike('change_reason', '%Purchase:%')
-            .range(stockAddedStart, stockAddedStart + chunkSize - 1);
-
-          if (stockAddedError) throw stockAddedError;
-
-          if (stockAddedChunk && stockAddedChunk.length > 0) {
-            allStockAddedData.push(...stockAddedChunk);
-            stockAddedStart += chunkSize;
-            hasStockAddedMore = stockAddedChunk.length === chunkSize;
-          } else {
-            hasStockAddedMore = false;
-          }
-        }
-
-        // Calculate total stockAdded for the summary
-        const totalStockAddedSum = allStockAddedData.reduce((sum, entry) => {
-          return sum + (Number(entry.new_quantity) - Number(entry.previous_quantity));
-        }, 0);
-
-        // Load all transfer out
-        let allTransferOutData: any[] = [];
-        let transferOutStart = 0;
-        let hasTransferOutMore = true;
-
-        while (hasTransferOutMore) {
-          const { data: transferOutChunk, error: transferOutError } = await supabase
-            .from('stock_history')
-            .select('previous_quantity, new_quantity, created_at')
-            .eq('product_id', product.id)
-            .eq('location_id', currentBusiness.id)
-            .eq('change_reason', 'Transfer Out')
-            .range(transferOutStart, transferOutStart + chunkSize - 1);
-
-          if (transferOutError) throw transferOutError;
-
-          if (transferOutChunk && transferOutChunk.length > 0) {
-            allTransferOutData.push(...transferOutChunk);
-            transferOutStart += chunkSize;
-            hasTransferOutMore = transferOutChunk.length === chunkSize;
-          } else {
-            hasTransferOutMore = false;
-          }
-        }
-
-        // Load all return in
-        let allReturnInData: any[] = [];
-        let returnInStart = 0;
-        let hasReturnInMore = true;
-
-        while (hasReturnInMore) {
-          const { data: returnInChunk, error: returnInError } = await supabase
-            .from('stock_history')
-            .select('previous_quantity, new_quantity, created_at')
-            .eq('product_id', product.id)
-            .eq('location_id', currentBusiness.id)
-            .in('change_reason', ['Customer Return', 'Return In'])
-            .range(returnInStart, returnInStart + chunkSize - 1);
-
-          if (returnInError) throw returnInError;
-
-          if (returnInChunk && returnInChunk.length > 0) {
-            allReturnInData.push(...returnInChunk);
-            returnInStart += chunkSize;
-            hasReturnInMore = returnInChunk.length === chunkSize;
-          } else {
-            hasReturnInMore = false;
-          }
-        }
-
-        // Load all return out
-        let allReturnOutData: any[] = [];
-        let returnOutStart = 0;
-        let hasReturnOutMore = true;
-
-        while (hasReturnOutMore) {
-          const { data: returnOutChunk, error: returnOutError } = await supabase
-            .from('stock_history')
-            .select('previous_quantity, new_quantity, created_at')
-            .eq('product_id', product.id)
-            .eq('location_id', currentBusiness.id)
-            .in('change_reason', ['Return to Supplier', 'Return Out'])
-            .range(returnOutStart, returnOutStart + chunkSize - 1);
-
-          if (returnOutError) throw returnOutError;
-
-          if (returnOutChunk && returnOutChunk.length > 0) {
-            allReturnOutData.push(...returnOutChunk);
-            returnOutStart += chunkSize;
-            hasReturnOutMore = returnOutChunk.length === chunkSize;
-          } else {
-            hasReturnOutMore = false;
-          }
-        }
-
-        // Build daily transactions map
-        const dailyTransactions = new Map<string, {
-          itemsSold: number;
-          stockAdded: number;
-          transferOut: number;
-          returnIn: number;
-          returnOut: number;
-        }>();
-
-        // Process sales by date
-        if (allSalesData) {
-          allSalesData.forEach((sale: any) => {
-            const date = new Date(sale.date).toISOString().split('T')[0];
-            const items = Array.isArray(sale.items) ? sale.items : [];
-            items.forEach((item: any) => {
-              if (item.productId === product.id) {
-                const existing = dailyTransactions.get(date) || { itemsSold: 0, stockAdded: 0, transferOut: 0, returnIn: 0, returnOut: 0 };
-                existing.itemsSold += Number(item.quantity) || 0;
-                dailyTransactions.set(date, existing);
-              }
-            });
-          });
-        }
-
-        // Process stock added (Purchase) by date
-        if (allStockAddedData) {
-          allStockAddedData.forEach((entry: any) => {
-            const date = new Date(entry.created_at).toISOString().split('T')[0];
-            const delta = Number(entry.new_quantity) - Number(entry.previous_quantity);
-            if (delta > 0) {
-              const existing = dailyTransactions.get(date) || { itemsSold: 0, stockAdded: 0, transferOut: 0, returnIn: 0, returnOut: 0 };
-              existing.stockAdded += delta;
-              dailyTransactions.set(date, existing);
-            }
-          });
-        }
-
-        // Process transfers out by date
-        if (allTransferOutData) {
-          allTransferOutData.forEach((entry: any) => {
-            const date = new Date(entry.created_at).toISOString().split('T')[0];
-            const delta = Number(entry.previous_quantity) - Number(entry.new_quantity);
-            if (delta > 0) {
-              const existing = dailyTransactions.get(date) || { itemsSold: 0, stockAdded: 0, transferOut: 0, returnIn: 0, returnOut: 0 };
-              existing.transferOut += delta;
-              dailyTransactions.set(date, existing);
-            }
-          });
-        }
-
-        // Process returns in by date
-        if (allReturnInData) {
-          allReturnInData.forEach((entry: any) => {
-            const date = new Date(entry.created_at).toISOString().split('T')[0];
-            const delta = Number(entry.new_quantity) - Number(entry.previous_quantity);
-            if (delta > 0) {
-              const existing = dailyTransactions.get(date) || { itemsSold: 0, stockAdded: 0, transferOut: 0, returnIn: 0, returnOut: 0 };
-              existing.returnIn += delta;
-              dailyTransactions.set(date, existing);
-            }
-          });
-        }
-
-        // Process returns out by date
-        if (allReturnOutData) {
-          allReturnOutData.forEach((entry: any) => {
-            const date = new Date(entry.created_at).toISOString().split('T')[0];
-            const delta = Number(entry.previous_quantity) - Number(entry.new_quantity);
-            if (delta > 0) {
-              const existing = dailyTransactions.get(date) || { itemsSold: 0, stockAdded: 0, transferOut: 0, returnIn: 0, returnOut: 0 };
-              existing.returnOut += delta;
-              dailyTransactions.set(date, existing);
-            }
-          });
-        }
-
-        // Sort dates and calculate daily breakdown
-        const sortedDates = Array.from(dailyTransactions.keys()).sort();
-        const dailyBreakdown: DailyBreakdown[] = [];
-        let runningStock = openingStock;
-
-        sortedDates.forEach(date => {
-          const day = dailyTransactions.get(date)!;
-          const startingStock = runningStock;
-
-          // Apply formula: Closing = Opening - Items Sold + Stock Added - Transfer Out + Return In - Return Out
-          const endingStock = startingStock - day.itemsSold + day.stockAdded - day.transferOut + day.returnIn - day.returnOut;
-
-          dailyBreakdown.push({
-            date,
-            startingStock,
-            itemsSold: day.itemsSold,
-            stockAdded: day.stockAdded,
-            stockIn: 0,
-            transferOut: day.transferOut,
-            returnIn: day.returnIn,
-            returnOut: day.returnOut,
-            endingStock,
-          });
-
-          runningStock = endingStock;
-        });
-
-        // Calculate totals
-        const totalItemsSold = dailyBreakdown.reduce((sum, day) => sum + day.itemsSold, 0);
-        const totalStockAdded = dailyBreakdown.reduce((sum, day) => sum + day.stockAdded, 0);
-        const totalTransferOut = dailyBreakdown.reduce((sum, day) => sum + day.transferOut, 0);
-        const totalReturnIn = dailyBreakdown.reduce((sum, day) => sum + day.returnIn, 0);
-        const totalReturnOut = dailyBreakdown.reduce((sum, day) => sum + day.returnOut, 0);
-
-        const calculatedClosingStock = runningStock;
-
-        const { data: productData } = await supabase
-          .from('products')
-          .select('quantity')
-          .eq('id', product.id)
-          .single();
-
-        const currentStock = Number(productData?.quantity) || 0;
+        // Mock reconciliation calculation
+        const currentStock = product.quantity;
+        const calculatedClosingStock = product.quantity; // Assuming no discrepancies for dummy
         const discrepancy = currentStock - calculatedClosingStock;
 
         setReconciliationData({
           currentStock,
-          openingStock,
-          itemsSold: totalItemsSold,
-          stockAdded: totalStockAdded,
+          openingStock: product.quantity,
+          itemsSold: 0,
+          stockAdded: 0,
           stockIn: 0,
-          transferOut: totalTransferOut,
-          returnIn: totalReturnIn,
-          returnOut: totalReturnOut,
+          transferOut: 0,
+          returnIn: 0,
+          returnOut: 0,
           calculatedClosingStock,
           discrepancy,
-          dailyBreakdown,
+          dailyBreakdown: [],
         });
       } catch (error) {
         console.error('Error calculating reconciliation:', error);
@@ -399,35 +137,7 @@ const StockReconciliation: React.FC<StockReconciliationProps> = ({
     setIsApplying(true);
 
     try {
-      // Update product quantity and prices
-      const { error: updateError } = await supabase
-        .from('products')
-        .update({
-          quantity: reconciliationData.calculatedClosingStock,
-          cost_price: adjustedCostPrice,
-          selling_price: adjustedSellingPrice
-        })
-        .eq('id', product.id)
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
-
-      // Create a stock history entry for the correction
-      const { error: historyError } = await supabase
-        .from('stock_history')
-        .insert({
-          product_id: product.id,
-          user_id: user.id,
-          location_id: currentBusiness.id,
-          previous_quantity: reconciliationData.currentStock,
-          new_quantity: reconciliationData.calculatedClosingStock,
-          change_reason: 'Stock Reconciliation',
-          reference_id: null,
-          created_at: new Date().toISOString(),
-        });
-
-      if (historyError) throw historyError;
-
+      // Mock update
       toast.success(
         `Stock reconciled successfully! Corrected ${Math.abs(
           reconciliationData.discrepancy

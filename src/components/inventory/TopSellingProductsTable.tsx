@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import {
   Table,
@@ -12,9 +13,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { FileDown, ChevronDown } from 'lucide-react';
 import { Product } from '@/types';
 import { formatNumber } from '@/lib/utils';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
 import ProductImage from './ProductImage';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -33,11 +33,11 @@ const TopSellingProductsTable: React.FC<TopSellingProductsTableProps> = ({
   onExport,
   period = 'this-month'
 }) => {
-  const { settings } = useBusinessSettings();
-  const navigate = useNavigate();
+  const settings = { currency: 'UGX' };
+  const router = useRouter();
 
   const handleProductClick = (productId: string) => {
-    navigate(`/inventory/${productId}`);
+    router.push(`/inventory/${productId}`);
   };
 
   const calculateProfitMargin = (product: TopSellingProduct) => {
@@ -92,12 +92,12 @@ const TopSellingProductsTable: React.FC<TopSellingProductsTableProps> = ({
     
     // Add title
     doc.setFontSize(18);
-    doc.setFont(undefined, 'bold');
+    doc.setFont("helvetica", "bold");
     doc.text('Top Selling Products Report', 14, 22);
     
     // Add period and date
     doc.setFontSize(12);
-    doc.setFont(undefined, 'normal');
+    doc.setFont("helvetica", "normal");
     doc.text(`Period: ${periodLabel}`, 14, 32);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 40);
 

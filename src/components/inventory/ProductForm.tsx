@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, DragEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,11 +13,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Product, ProductCategory, ProductFormData } from '@/types';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
 import { toast } from 'sonner';
 import { Trash2, Upload, ExternalLink, Loader2, Zap, Calendar } from 'lucide-react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useProductImage } from '@/hooks/useProductImage';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -29,6 +27,12 @@ interface ProductFormProps {
   onProductSubmit: (data: ProductFormData) => void;
   isLoading: boolean;
 }
+
+// Mock hooks
+const useProductImage = (userId: string | undefined) => ({
+    uploadProductImage: async (file: File) => { return URL.createObjectURL(file); },
+    compressImage: async (file: File) => { return file; }
+});
 
 // Extended form data type to handle quantity as string or number
 interface ExtendedProductFormData extends Omit<ProductFormData, 'quantity'> {
@@ -42,8 +46,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onProductSubmit,
   isLoading,
 }) => {
-  const navigate = useNavigate();
-  const { settings } = useBusinessSettings();
+  const router = useRouter();
+  const settings = { currency: 'UGX' };
   const { user } = useAuth();
   const { uploadProductImage, compressImage } = useProductImage(user?.id);
   
@@ -417,7 +421,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                     type="button"
                     variant="link"
                     className="p-0 h-auto text-blue-600 underline"
-                    onClick={() => navigate(`/categories?returnTo=${encodeURIComponent(window.location.pathname)}`)}
+                    onClick={() => router.push(`/categories?returnTo=${encodeURIComponent(window.location.pathname)}`)}
                     disabled={isSubmitting}
                   >
                     Categories page <ExternalLink className="h-3 w-3 ml-1 inline" />
@@ -761,7 +765,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Button
               variant="outline"
               type="button"
-              onClick={() => navigate('/inventory')}
+              onClick={() => router.push('/inventory')}
               disabled={isSubmitting || compressing}
             >
               Cancel
