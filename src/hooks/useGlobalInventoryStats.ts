@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { getProducts } from "@/lib/dummyData";
 
 export interface GlobalInventoryStats {
   totalCostValue: number;
@@ -22,31 +21,27 @@ export const useGlobalInventoryStats = (businessId: string | undefined) => {
         };
       }
 
-      const { data, error } = await (supabase.rpc as any)(
-        "get_inventory_stats",
-        {
-          p_location_id: businessId,
-        },
-      );
+      const products = await getProducts();
 
-      if (error) {
-        console.error("Error fetching global stats:", error);
-        throw error;
-      }
+      let totalCostValue = 0;
+      let totalStockValue = 0;
+      let lowStockCount = 0;
+      let outOfStockCount = 0;
 
-      // Map the snake_case or json keys to our interface
-      // The RPC returns a JSON object, so keys will be exactly what we built in json_build_object
-      const result = data as any;
+      products.forEach(p => {
+          totalCostValue += (p.costPrice || 0) * (p.quantity || 0);
+          totalStockValue += (p.sellingPrice || 0) * (p.quantity || 0);
+          if (p.quantity <= 0) outOfStockCount++;
+          else if (p.quantity <= p.minimumStock) lowStockCount++;
+      });
 
       return {
-        totalCostValue: Number(result.totalCostValue) || 0,
-        totalStockValue: Number(result.totalStockValue) || 0,
-        lowStockCount: Number(result.lowStockCount) || 0,
-        outOfStockCount: Number(result.outOfStockCount) || 0,
+        totalCostValue,
+        totalStockValue,
+        lowStockCount,
+        outOfStockCount,
       };
     },
     enabled: !!businessId,
-    staleTime: 30 * 1000, // 30 seconds
-    gcTime: 5 * 60 * 1000, // Keep cache for 5 mins
   });
 };

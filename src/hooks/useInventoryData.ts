@@ -1,3 +1,4 @@
+"use client";
 import { useMemo } from 'react';
 import { Product } from '@/types';
 import { Sale } from '@/types';
@@ -78,7 +79,7 @@ export const useInventoryData = (
       });
       
       // Add sold quantity to products and sort by highest sales quantity
-      return filteredProducts
+      const result = filteredProducts
         .map(product => {
           try {
             return {
@@ -90,9 +91,11 @@ export const useInventoryData = (
             return null;
           }
         })
-        .filter(product => product && product.soldQuantity > 0) // Only show products that were sold
+        .filter((product): product is Product & { soldQuantity: number } => product !== null && product.soldQuantity > 0) // Only show products that were sold
         .sort((a, b) => b.soldQuantity - a.soldQuantity)
         .slice(0, 10);
+
+      return result;
     } catch (error) {
       console.error('Error calculating top selling products:', error);
       return [];

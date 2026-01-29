@@ -281,7 +281,7 @@ const StockSummaryTable: React.FC<StockSummaryTableProps> = ({
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
+                <SelectItem key={category || 'uncategorized'} value={category || 'uncategorized'}>
                   {category}
                 </SelectItem>
               ))}

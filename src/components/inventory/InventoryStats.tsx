@@ -3,8 +3,10 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Product } from '@/types';
 import { Package, AlertTriangle, Ban, TrendingUp, DollarSign } from 'lucide-react';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
 import { formatNumber } from '@/lib/utils';
+
+// Mock hook
+const useBusinessSettings = () => ({ settings: { currency: 'UGX' } });
 
 interface InventoryStatsProps {
   products: Product[];

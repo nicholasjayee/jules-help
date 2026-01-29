@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useBusiness } from '@/contexts/BusinessContext';
 import { toast } from 'sonner';
 
@@ -32,7 +31,8 @@ interface ProfileContextType {
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { userId } = useCurrentUser();
+  const { user } = useAuth();
+  const userId = user?.id;
   const { currentBusiness } = useBusiness();
   const [profiles, setProfiles] = useState<BusinessProfile[]>([]);
   const [currentProfile, setCurrentProfile] = useState<BusinessProfile | null>(null);
@@ -43,16 +43,21 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('business_profiles')
-        .select('*')
-        .eq('business_location_id', currentBusiness.id)
-        .eq('is_active', true)
-        .order('profile_name');
-
-      if (error) throw error;
-
-      setProfiles(data || []);
+        // Mock profiles
+        const mockProfiles: BusinessProfile[] = [
+            {
+                id: 'prof-1',
+                business_location_id: currentBusiness.id,
+                profile_name: 'Manager',
+                email: 'manager@example.com',
+                role: 'admin',
+                is_active: true,
+                created_by: userId,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            }
+        ];
+      setProfiles(mockProfiles);
     } catch (error) {
       console.error('Error loading profiles:', error);
       toast.error('Failed to load profiles');
@@ -64,94 +69,44 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const createProfile = async (data: Omit<BusinessProfile, 'id' | 'created_at' | 'updated_at' | 'created_by' | 'business_location_id'>): Promise<BusinessProfile | null> => {
     if (!userId || !currentBusiness?.id) return null;
 
-    try {
-      const { data: newProfile, error } = await supabase
-        .from('business_profiles')
-        .insert({
-          ...data,
-          business_location_id: currentBusiness.id,
-          created_by: userId
-        })
-        .select()
-        .single();
+    const newProfile: BusinessProfile = {
+        id: `prof-${Date.now()}`,
+        business_location_id: currentBusiness.id,
+        created_by: userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ...data
+    };
 
-      if (error) throw error;
-
-      setProfiles(prev => [...prev, newProfile]);
-      
-      // Auto-select first profile if none is currently selected
-      if (!currentProfile) {
-        handleSetCurrentProfile(newProfile);
-      }
-      
-      toast.success(`Profile "${data.profile_name}" created successfully`);
-      return newProfile;
-    } catch (error) {
-      console.error('Error creating profile:', error);
-      toast.error('Failed to create profile');
-      return null;
-    }
+    setProfiles(prev => [...prev, newProfile]);
+    if (!currentProfile) handleSetCurrentProfile(newProfile);
+    toast.success(`Profile "${data.profile_name}" created successfully`);
+    return newProfile;
   };
 
   const updateProfile = async (id: string, data: Partial<BusinessProfile>): Promise<boolean> => {
-    try {
-      const { error } = await supabase
-        .from('business_profiles')
-        .update(data)
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setProfiles(prev => prev.map(profile => 
-        profile.id === id ? { ...profile, ...data } : profile
-      ));
-
-      if (currentProfile?.id === id) {
+    setProfiles(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
+    if (currentProfile?.id === id) {
         setCurrentProfile(prev => prev ? { ...prev, ...data } : null);
-      }
-
-      toast.success('Profile updated successfully');
-      return true;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
-      return false;
     }
+    toast.success('Profile updated successfully');
+    return true;
   };
 
   const deleteProfile = async (id: string): Promise<boolean> => {
-    try {
-      const { error } = await supabase
-        .from('business_profiles')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setProfiles(prev => prev.filter(profile => profile.id !== id));
-      
-      if (currentProfile?.id === id) {
-        setCurrentProfile(null);
-      }
-
-      toast.success('Profile deleted successfully');
-      return true;
-    } catch (error) {
-      console.error('Error deleting profile:', error);
-      toast.error('Failed to delete profile');
-      return false;
-    }
+    setProfiles(prev => prev.filter(p => p.id !== id));
+    if (currentProfile?.id === id) setCurrentProfile(null);
+    toast.success('Profile deleted successfully');
+    return true;
   };
 
   const toggleProfileStatus = async (id: string, isActive: boolean): Promise<boolean> => {
     return updateProfile(id, { is_active: isActive });
   };
 
-  // Load profiles when business changes
   useEffect(() => {
     if (currentBusiness?.id) {
       loadProfiles();
-      // Clear current profile when business changes
       setCurrentProfile(null);
     } else {
       setProfiles([]);
@@ -159,7 +114,6 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [currentBusiness?.id, userId]);
 
-  // Load current profile from localStorage or auto-select first profile
   useEffect(() => {
     if (profiles.length > 0 && currentBusiness?.id) {
       const savedProfileId = localStorage.getItem(`currentProfile_${currentBusiness.id}`);
@@ -170,15 +124,12 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
           return;
         }
       }
-      
-      // Auto-select first profile if none is saved and none is currently selected
       if (!currentProfile) {
         handleSetCurrentProfile(profiles[0]);
       }
     }
   }, [profiles, currentBusiness?.id]);
 
-  // Save current profile to localStorage
   const handleSetCurrentProfile = (profile: BusinessProfile | null) => {
     setCurrentProfile(profile);
     if (currentBusiness?.id) {

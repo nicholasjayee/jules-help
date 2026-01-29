@@ -9,9 +9,7 @@ import { Plus, Trash2, Save, CalendarIcon, ChevronUp, ChevronDown } from 'lucide
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useProducts } from '@/hooks/useProducts';
 import { useToast } from '@/hooks/use-toast';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useStockHistory } from '@/hooks/useStockHistory';
 import { Product } from '@/types';
 import ProductSuggestionsPanel from './ProductSuggestionsPanel';
 import { useProductSuggestions } from '@/hooks/useProductSuggestions';
@@ -28,6 +26,16 @@ interface StockAddRow {
   searchTerm: string;
 }
 const STORAGE_KEY = 'bulkStockAddRows';
+
+// Mock hooks
+const useBusinessSettings = () => ({ settings: { currency: 'UGX' } });
+const useStockHistory = (userId: string | undefined) => {
+    const stockHistory: any[] = [];
+    return {
+        stockHistory,
+        loadStockHistory: async () => {}
+    };
+}
 
 // Mobile Stock Row Component
 const MobileStockRow = ({
