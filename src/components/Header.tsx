@@ -1,5 +1,5 @@
 
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import Logo from './header/Logo';
 import UserMenu from './header/UserMenu';

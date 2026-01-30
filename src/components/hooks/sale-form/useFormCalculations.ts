@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SaleItem } from '@/types';
+import { SaleItem } from '@/components/types';
 
 interface UseFormCalculationsProps {
   taxRate: number;

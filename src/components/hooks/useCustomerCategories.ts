@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 export interface CustomerCategory {
   id: string;

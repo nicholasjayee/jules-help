@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { formatNumber, cn } from '@/lib/utils';
-import { InstallmentPayment } from '@/hooks/useInstallmentPayments';
-import { PaymentChange } from '@/hooks/useLocalPaymentChanges';
+import { InstallmentPayment } from '@/components/hooks/useInstallmentPayments';
+import { PaymentChange } from '@/components/hooks/useLocalPaymentChanges';
 import { format } from 'date-fns';
 import { Trash2, Clock, Check, X, Edit3, Link, CalendarIcon } from 'lucide-react';
 

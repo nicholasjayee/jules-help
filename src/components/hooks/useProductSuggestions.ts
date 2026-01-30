@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { Product } from '@/types';
+import { Product } from '@/components/types';
 
 export const useProductSuggestions = (products: Product[], searchTerm: string) => {
   const [isOpen, setIsOpen] = useState(false);

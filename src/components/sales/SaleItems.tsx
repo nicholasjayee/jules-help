@@ -2,7 +2,7 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SaleItem } from "@/types";
+import { SaleItem } from "@/components/types";
 import ProductSaleItemInput from "@/components/ProductSaleItemInput";
 
 interface SaleItemsProps {

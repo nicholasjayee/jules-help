@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { ReceiptData } from '@/types/receipt';
+import { ReceiptData } from '@/components/types/receipt';
 
 interface VectorPDFOptions {
   filename?: string;

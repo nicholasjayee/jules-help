@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 
 interface UpdateNotificationButtonProps {
   onUpdate: () => void;

@@ -1,10 +1,10 @@
 
-import { Product, DbProduct, mapDbProductToProduct } from '@/types';
+import { Product, DbProduct, mapDbProductToProduct } from '@/components/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useStockHistory } from '@/hooks/useStockHistory';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useActivityLogger } from '@/hooks/useActivityLogger';
+import { useToast } from '@/components/hooks/use-toast';
+import { useStockHistory } from '@/components/hooks/useStockHistory';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useActivityLogger } from '@/components/hooks/useActivityLogger';
 
 /**
  * Hook for Create, Read, Update, Delete operations on products

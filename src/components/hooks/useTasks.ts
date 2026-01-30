@@ -1,10 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Task, CreateTaskData, UpdateTaskData } from '@/types/task';
+import { Task, CreateTaskData, UpdateTaskData } from '@/components/types/task';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useRecurringTasks } from '@/hooks/useRecurringTasks';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useRecurringTasks } from '@/components/hooks/useRecurringTasks';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 

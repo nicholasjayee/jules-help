@@ -1,8 +1,8 @@
 
-import { Product } from '@/types';
+import { Product } from '@/components/types';
 import jsPDF from 'jspdf';
 import { formatNumber } from '@/lib/utils';
-import { BusinessSettings } from '@/hooks/useBusinessSettings';
+import { BusinessSettings } from '@/components/hooks/useBusinessSettings';
 
 export const exportProductsToPDF = (products: Product[], businessSettings?: BusinessSettings): void => {
   // Use provided business settings or fallback to defaults

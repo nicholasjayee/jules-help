@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import { formatNumber } from '@/lib/utils';
 import { TrendingUp, DollarSign, Wallet } from 'lucide-react';
 

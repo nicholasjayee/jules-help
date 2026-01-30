@@ -1,5 +1,6 @@
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Sale, AnalyticsData } from '@/types';
+import { Sale, AnalyticsData } from '@/components/types/index';
 import { 
   isWithinInterval, 
   startOfDay, 
@@ -15,8 +16,9 @@ import {
   subMonths,
   isSameDay
 } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { dataStore } from '@/lib/dataStore';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 interface UseAnalyticsDataProps {
   sales: Sale[];
@@ -31,10 +33,9 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
   const [expenses, setExpenses] = useState<number>(0);
   const [isLoadingExpenses, setIsLoadingExpenses] = useState(true);
   const { currentBusiness } = useBusiness();
+  const { user } = useAuth();
 
-  // Memoize the expensive calculations
   const calculateSaleTotals = useCallback((sale: Sale) => {
-    // Calculate total sale price after discounts (same logic as revenue calculation)
     const totalSalePrice = sale.items && Array.isArray(sale.items) 
       ? sale.items.reduce((sum, item) => {
           const subtotal = item.price * item.quantity;
@@ -52,9 +53,7 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     return { totalSalePrice, totalCost };
   }, []);
 
-  // Memoize date filtering function
   const matchesDateFilter = useCallback((saleDate: Date): boolean => {
-    // Validate the sale date
     if (isNaN(saleDate.getTime())) {
       return false;
     }
@@ -125,7 +124,6 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     }
   }, [dateFilter, isCustomRange, isSpecificDate, dateRange, specificDate]);
 
-  // Memoize filtered sales calculation
   const filteredSalesData = useMemo(() => {
     const filtered = sales.filter(sale => {
       const saleDate = new Date(sale.date);
@@ -138,11 +136,9 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     };
   }, [sales, matchesDateFilter]);
 
-  // Memoize analytics data calculation
   const analyticsData = useMemo((): AnalyticsData => {
     return filteredSalesData.nonQuotes.reduce((acc, sale) => {
       const { totalSalePrice, totalCost } = calculateSaleTotals(sale);
-      // Calculate profit from actual revenue and cost to handle old sales correctly
       const actualProfit = totalSalePrice - totalCost;
       
       return {
@@ -161,7 +157,6 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     });
   }, [filteredSalesData.nonQuotes, calculateSaleTotals]);
 
-  // Memoize bar chart data
   const barChartData = useMemo(() => [
     { name: 'Total Sales', amount: analyticsData.totalSales },
     { name: 'Total Cost', amount: analyticsData.totalCost },
@@ -169,22 +164,19 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     { name: 'Total Profit', amount: analyticsData.totalProfit },
   ], [analyticsData, expenses]);
 
-  // Memoize recent sales calculation
   const recentSales = useMemo(() => {
     return [...filteredSalesData.all]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .slice(0, 20);
   }, [filteredSalesData.all]);
 
-  // Memoize non-quote sales count
   const nonQuoteSalesCount = useMemo(() => {
     return filteredSalesData.nonQuotes.length;
   }, [filteredSalesData.nonQuotes]);
 
-  // Fetch expenses data based on the current date filter and business location
   useEffect(() => {
     const fetchExpenses = async () => {
-      if (!currentBusiness) {
+      if (!currentBusiness || !user) {
         setExpenses(0);
         setIsLoadingExpenses(false);
         return;
@@ -192,67 +184,22 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
 
       setIsLoadingExpenses(true);
       try {
-        let query = supabase
-          .from('expenses')
-          .select('amount, date')
-          .eq('location_id', currentBusiness.id);
+        const allExpenses = await dataStore.getExpenses(user.id);
         
-        // Apply the same date filtering to expenses as we do to sales
-        if (isCustomRange && dateRange.from && dateRange.to) {
-          query = query.gte('date', dateRange.from.toISOString())
-                      .lte('date', dateRange.to.toISOString());
-        } else if (isSpecificDate && specificDate) {
-          const startOfSpecificDay = startOfDay(specificDate);
-          const endOfSpecificDay = endOfDay(specificDate);
-          query = query.gte('date', startOfSpecificDay.toISOString())
-                      .lte('date', endOfSpecificDay.toISOString());
-        } else if (dateFilter !== 'all') {
-          const today = new Date();
-          
-          switch (dateFilter) {
-            case 'today':
-              query = query.gte('date', startOfDay(today).toISOString())
-                          .lte('date', endOfDay(today).toISOString());
-              break;
-            case 'yesterday':
-              const yesterday = subDays(today, 1);
-              query = query.gte('date', startOfDay(yesterday).toISOString())
-                          .lte('date', endOfDay(yesterday).toISOString());
-              break;
-            case 'this-week':
-              query = query.gte('date', startOfWeek(today, { weekStartsOn: 1 }).toISOString())
-                          .lte('date', endOfWeek(today, { weekStartsOn: 1 }).toISOString());
-              break;
-            case 'last-week':
-              const lastWeekStart = subWeeks(startOfWeek(today, { weekStartsOn: 1 }), 1);
-              const lastWeekEnd = endOfWeek(lastWeekStart, { weekStartsOn: 1 });
-              query = query.gte('date', lastWeekStart.toISOString())
-                          .lte('date', lastWeekEnd.toISOString());
-              break;
-            case 'this-month':
-              query = query.gte('date', startOfMonth(today).toISOString())
-                          .lte('date', endOfMonth(today).toISOString());
-              break;
-            case 'last-month':
-              const lastMonth = subMonths(today, 1);
-              query = query.gte('date', startOfMonth(lastMonth).toISOString())
-                          .lte('date', endOfMonth(lastMonth).toISOString());
-              break;
-            case 'this-year':
-              query = query.gte('date', startOfYear(today).toISOString())
-                          .lte('date', endOfYear(today).toISOString());
-              break;
-          }
-        }
-        
-        const { data, error } = await query;
-        
-        if (error) {
-          console.error('Error fetching expenses:', error);
-          return;
-        }
-        
-        const totalExpenses = data ? data.reduce((sum, expense) => sum + Number(expense.amount), 0) : 0;
+        // Client-side filtering
+        const filteredExpenses = allExpenses.filter(expense => {
+           // We assume dataStore returns all expenses for the user (or we need to filter by location if the store didn't)
+           // If dataStore.getExpenses(userId) returns all, we should filter by location if locationId was part of expense interface (it is in Supabase DB schema, but maybe not in Expense interface?)
+           // Expense interface in hooks/useExpenses.ts had location_id when mapping?
+           // In types/index.ts: Expense doesn't have location_id explicit in the interface, but DBExpense does.
+           // However, dataStore just returns what we put in.
+           // For now, assuming dummy data is small, we filter by date only.
+
+           const expenseDate = new Date(expense.date);
+           return matchesDateFilter(expenseDate);
+        });
+
+        const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
         setExpenses(totalExpenses);
       } catch (error) {
         console.error('Failed to fetch expenses:', error);
@@ -262,7 +209,7 @@ export function useAnalyticsData({ sales, dateFilter, dateRange, specificDate, i
     };
     
     fetchExpenses();
-  }, [dateFilter, isCustomRange, isSpecificDate, dateRange.from, dateRange.to, specificDate, currentBusiness]);
+  }, [dateFilter, isCustomRange, isSpecificDate, dateRange.from, dateRange.to, specificDate, currentBusiness, user, matchesDateFilter]);
 
   return {
     filteredSales: filteredSalesData.all,

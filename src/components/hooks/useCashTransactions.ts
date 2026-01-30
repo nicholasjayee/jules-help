@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useToast } from '@/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useToast } from '@/components/hooks/use-toast';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CashTransaction,
@@ -12,7 +12,7 @@ import {
   CashAccount,
   mapDbCashTransactionToCashTransaction,
   mapCashTransactionFormToDbInsert
-} from '@/types/cash';
+} from '@/components/types/cash';
 
 export const useCashTransactions = (accountId?: string) => {
   const [transactions, setTransactions] = useState<CashTransaction[]>([]);

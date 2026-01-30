@@ -1,4 +1,4 @@
-import { Sale, BusinessSettings } from '@/types';
+import { Sale, BusinessSettings } from '@/components/types';
 import { formatNumber } from '@/lib/utils';
 import { format } from 'date-fns';
 import { generateVectorPDF } from './generateVectorPDF';

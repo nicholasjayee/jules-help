@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Customer } from '@/hooks/useCustomers';
+import { Customer } from '@/components/hooks/useCustomers';
 
 export const useCustomerData = (
   customers: Customer[],

@@ -1,4 +1,4 @@
-import { Expense } from '@/hooks/useExpenses';
+import { Expense } from '@/components/hooks/useExpenses';
 import { format } from 'date-fns';
 
 export const exportExpensesToCSV = (

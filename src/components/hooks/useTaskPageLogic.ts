@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Task, CreateTaskData, UpdateTaskData } from '@/types/task';
+import { Task, CreateTaskData, UpdateTaskData } from '@/components/types/task';
 import { isToday } from 'date-fns';
 
 interface UseTaskPageLogicProps {

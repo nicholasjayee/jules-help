@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { TaskCategory } from '@/types/task';
+import { TaskCategory } from '@/components/types/task';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { toast } from 'sonner';
 
 export const useTaskCategories = () => {

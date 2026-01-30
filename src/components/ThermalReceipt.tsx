@@ -1,11 +1,11 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Sale, BusinessSettings } from '@/types';
+import { Sale, BusinessSettings } from '@/components/types';
 import { format } from 'date-fns';
 import { formatNumber } from '@/lib/utils';
-import { parsePaymentInfo, useBusinessSettings } from '@/hooks/useBusinessSettings';
+import { parsePaymentInfo, useBusinessSettings } from '@/components/hooks/useBusinessSettings';
 import { numberToWords } from '@/utils/numberToWords';
-import { useInstallmentPayments } from '@/hooks/useInstallmentPayments';
+import { useInstallmentPayments } from '@/components/hooks/useInstallmentPayments';
 
 interface ThermalReceiptProps {
   sale: Sale;

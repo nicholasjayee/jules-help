@@ -1,9 +1,9 @@
 import { useMemo, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
-import { useSalesData } from '@/hooks/useSalesData';
-import { useAppUpdate } from '@/hooks/useAppUpdate';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
+import { useSalesData } from '@/components/hooks/useSalesData';
+import { useAppUpdate } from '@/components/hooks/useAppUpdate';
 
 export const useDashboardData = () => {
   const { user } = useAuth();

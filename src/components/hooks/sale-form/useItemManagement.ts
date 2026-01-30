@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SaleFormData, SaleItem } from '@/types';
+import { SaleFormData, SaleItem } from '@/components/types';
 
 const emptyItem: SaleItem = {
   description: '',

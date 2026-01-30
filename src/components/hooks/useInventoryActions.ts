@@ -1,5 +1,5 @@
 import { useProducts } from './useProducts';
-import { SaleItem, Product, mapDbProductToProduct } from '@/types';
+import { SaleItem, Product, mapDbProductToProduct } from '@/components/types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 

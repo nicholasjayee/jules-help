@@ -1,8 +1,9 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useCurrentUser } from '@/components/hooks/useCurrentUser';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { toast } from 'sonner';
+import { dataStore } from '@/lib/dataStore';
 
 export interface BusinessProfile {
   id: string;
@@ -43,16 +44,14 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('business_profiles')
-        .select('*')
-        .eq('business_location_id', currentBusiness.id)
-        .eq('is_active', true)
-        .order('profile_name');
+      const data = await dataStore.getProfiles(currentBusiness.id);
 
-      if (error) throw error;
+      // Filter by active if needed, but context seems to want all active ones.
+      // The original code: .eq('is_active', true).
+      // Let's filter here.
+      const activeProfiles = data.filter(p => p.is_active);
 
-      setProfiles(data || []);
+      setProfiles(activeProfiles || []);
     } catch (error) {
       console.error('Error loading profiles:', error);
       toast.error('Failed to load profiles');
@@ -65,17 +64,14 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!userId || !currentBusiness?.id) return null;
 
     try {
-      const { data: newProfile, error } = await supabase
-        .from('business_profiles')
-        .insert({
-          ...data,
-          business_location_id: currentBusiness.id,
-          created_by: userId
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      const newProfile = await dataStore.createProfile({
+        ...data,
+        id: `prof-${Date.now()}`,
+        business_location_id: currentBusiness.id,
+        created_by: userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
 
       setProfiles(prev => [...prev, newProfile]);
       
@@ -95,12 +91,8 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateProfile = async (id: string, data: Partial<BusinessProfile>): Promise<boolean> => {
     try {
-      const { error } = await supabase
-        .from('business_profiles')
-        .update(data)
-        .eq('id', id);
-
-      if (error) throw error;
+      const updated = await dataStore.updateProfile(id, data);
+      if (!updated) throw new Error("Update failed");
 
       setProfiles(prev => prev.map(profile => 
         profile.id === id ? { ...profile, ...data } : profile
@@ -121,12 +113,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteProfile = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await supabase
-        .from('business_profiles')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await dataStore.deleteProfile(id);
 
       setProfiles(prev => prev.filter(profile => profile.id !== id));
       
@@ -162,7 +149,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Load current profile from localStorage or auto-select first profile
   useEffect(() => {
     if (profiles.length > 0 && currentBusiness?.id) {
-      const savedProfileId = localStorage.getItem(`currentProfile_${currentBusiness.id}`);
+      const savedProfileId = typeof window !== 'undefined' ? localStorage.getItem(`currentProfile_${currentBusiness.id}`) : null;
       if (savedProfileId) {
         const profile = profiles.find(p => p.id === savedProfileId);
         if (profile) {
@@ -181,7 +168,7 @@ export const ProfileProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Save current profile to localStorage
   const handleSetCurrentProfile = (profile: BusinessProfile | null) => {
     setCurrentProfile(profile);
-    if (currentBusiness?.id) {
+    if (currentBusiness?.id && typeof window !== 'undefined') {
       if (profile) {
         localStorage.setItem(`currentProfile_${currentBusiness.id}`, profile.id);
       } else {

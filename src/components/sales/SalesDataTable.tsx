@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import SalesTable from '@/components/SalesTable';
 import SalesTableSkeleton from './SalesTableSkeleton';
 

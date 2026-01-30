@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Plus, Edit, Trash2, Settings } from 'lucide-react';
-import { useSalesCategories } from '@/hooks/useSalesCategories';
-import { SalesCategory } from '@/types';
+import { useSalesCategories } from '@/components/hooks/useSalesCategories';
+import { SalesCategory } from '@/components/types';
 const SalesCategoryManager = () => {
   const {
     categories,

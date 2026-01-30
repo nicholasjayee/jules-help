@@ -1,9 +1,9 @@
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Customer } from '@/types';
-import { Sale } from '@/types';
-import { BusinessSettings } from '@/types';
+import { Customer } from '@/components/types';
+import { Sale } from '@/components/types';
+import { BusinessSettings } from '@/components/types';
 import { format } from 'date-fns';
 import { formatNumber } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';

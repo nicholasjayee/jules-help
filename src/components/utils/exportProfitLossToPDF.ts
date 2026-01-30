@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { ProfitLossData } from '@/hooks/useProfitLossData';
+import { ProfitLossData } from '@/components/hooks/useProfitLossData';
 import { format } from 'date-fns';
 
 interface ExportPLPDFOptions {

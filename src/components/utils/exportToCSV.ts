@@ -1,4 +1,4 @@
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import { format } from 'date-fns';
 
 export const exportToCSV = (sales: Sale[]) => {

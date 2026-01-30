@@ -6,7 +6,7 @@ import {
   DrawerContent,
   DrawerClose
 } from '@/components/ui/drawer';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import { X } from 'lucide-react';
 
 interface ImageViewerProps {

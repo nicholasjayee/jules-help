@@ -7,7 +7,7 @@ import InstallmentPaymentInput from '@/components/sales/InstallmentPaymentInput'
 import InstallmentPaymentHistory from '@/components/sales/InstallmentPaymentHistory';
 import CashAccountSelection from '@/components/sales/CashAccountSelection';
 import SaleCategorySelector from '@/components/sales/SaleCategorySelector';
-import { PaymentChange } from '@/hooks/useLocalPaymentChanges';
+import { PaymentChange } from '@/components/hooks/useLocalPaymentChanges';
 
 interface SalePaymentSectionProps {
   paymentStatus: string;

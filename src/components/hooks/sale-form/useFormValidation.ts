@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SaleFormData, FormErrors } from '@/types';
+import { SaleFormData, FormErrors } from '@/components/types';
 
 interface UseFormValidationProps {
   formData: SaleFormData;

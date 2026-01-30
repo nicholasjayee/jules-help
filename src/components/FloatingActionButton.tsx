@@ -1,7 +1,9 @@
 
+'use client';
+
 import React, { useState } from 'react';
 import { Plus, Package, ShoppingCart, Users, DollarSign, CreditCard } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,15 +11,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 
 const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const isMobile = useIsMobile();
 
   const handleNavigation = (path: string, state?: any) => {
-    navigate(path, { state });
+    // Next.js router.push doesn't support state object directly in the same way.
+    // We can use query params or just navigation.
+    // For 'defaultPaymentStatus', we can pass it as query param
+    if (state && state.defaultPaymentStatus) {
+        router.push(`${path}?defaultPaymentStatus=${state.defaultPaymentStatus}`);
+    } else {
+        router.push(path);
+    }
     setIsOpen(false);
   };
 

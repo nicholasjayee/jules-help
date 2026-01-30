@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { Customer } from '@/hooks/useCustomers';
+import { Customer } from '@/components/hooks/useCustomers';
 import { format } from 'date-fns';
 
 export const exportCustomersToPDF = (

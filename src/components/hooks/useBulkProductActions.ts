@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { Product } from '@/types';
+import { Product } from '@/components/types';
 import { useProductCRUD } from './useProductCRUD';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/hooks/use-toast';
 
 export const useBulkProductActions = (
   userId: string | undefined,

@@ -1,6 +1,6 @@
 import { generateReceiptVectorPDF } from './generateReceiptVectorPDF';
 import { isIOS } from './deviceDetection';
-import { ReceiptData } from '@/types/receipt';
+import { ReceiptData } from '@/components/types/receipt';
 
 interface PDFOptions {
   autoPrint?: boolean;

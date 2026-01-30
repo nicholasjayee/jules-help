@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useSalesData } from '@/hooks/useSalesData';
-import { useProducts } from '@/hooks/useProducts';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useSalesData } from '@/components/hooks/useSalesData';
+import { useProducts } from '@/components/hooks/useProducts';
 import { getDateRangeFromFilter } from '@/utils/dateFilters';
 import { isSameDay } from 'date-fns';
 import { calculateItemActualAmount, calculateItemActualPrice } from '@/utils/discountCalculations';

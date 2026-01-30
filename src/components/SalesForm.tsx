@@ -1,23 +1,23 @@
 // SalesForm.tsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { Sale, SaleFormData, SaleItem, mapSaleToDbSale, Customer } from '@/types';
+import { Sale, SaleFormData, SaleItem, mapSaleToDbSale, Customer } from '@/components/types/index';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { calculateProfit } from '@/utils/calculateProfit';
-import { generateReceiptNumber } from '@/utils/generateReceiptNumber';
-import { supabase } from '@/integrations/supabase/client';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
-import { useProducts } from '@/hooks/useProducts';
-import { useSaleProductSelection } from '@/hooks/useSaleProductSelection';
-import { useCashAccounts } from '@/hooks/useCashAccounts';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useSaleDraft } from '@/hooks/useSaleDraft';
-import { useSaleFormLogic } from '@/hooks/useSaleFormLogic';
-import { useCashTransactionOperations } from '@/hooks/useCashTransactionOperations';
-import { useInstallmentPayments } from '@/hooks/useInstallmentPayments';
-import { useStockHistory } from '@/hooks/useStockHistory';
-import { useMessages } from '@/hooks/useMessages'; // This is the key fix!
+import { generateReceiptNumber } from '@/components/utils/generateReceiptNumber';
+import { dataStore } from '@/lib/dataStore';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
+import { useProducts } from '@/components/hooks/useProducts';
+import { useSaleProductSelection } from '@/components/hooks/useSaleProductSelection';
+import { useCashAccounts } from '@/components/hooks/useCashAccounts';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useSaleDraft } from '@/components/hooks/useSaleDraft';
+import { useSaleFormLogic } from '@/components/hooks/useSaleFormLogic';
+import { useCashTransactionOperations } from '@/components/hooks/useCashTransactionOperations';
+import { useInstallmentPayments } from '@/components/hooks/useInstallmentPayments';
+import { useStockHistory } from '@/components/hooks/useStockHistory';
+import { useMessages } from '@/components/hooks/useMessages'; // This is the key fix!
 
 // Components
 import SaleFormHeader from '@/components/sales/SaleFormHeader';
@@ -45,11 +45,15 @@ const SalesForm: React.FC<SalesFormProps> = ({
   draftData,
   onClearDraft,
 }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(initialData?.date || new Date());
-  const defaultPaymentStatus = location.state?.defaultPaymentStatus || initialData?.paymentStatus || 'Paid';
+
+  // Handle default payment status from props or URL params
+  const defaultPaymentStatus = initialData?.paymentStatus ||
+    (searchParams?.get('defaultPaymentStatus') as 'Paid' | 'NOT PAID' | 'Quote' | 'Installment Sale') ||
+    'Paid';
 
   const { settings } = useBusinessSettings();
   const { user } = useAuth();
@@ -283,29 +287,40 @@ const SalesForm: React.FC<SalesFormProps> = ({
         finalCashTransactionId
       );
 
-      const { data: saleResult, error } = initialData
-        ? await (supabase as any).from('sales').update({ ...saleDbData, updated_at: new Date().toISOString() }).eq('id', initialData.id).select().single()
-        : await (supabase as any).from('sales').insert(saleDbData).select().single();
+      let sale: Sale;
 
-      if (error) throw error;
-      const result = saleResult as any;
-
-      const sale: Sale = {
-        id: result.id,
-        receiptNumber: result.receipt_number,
-        customerName: result.customer_name,
-        customerAddress: result.customer_address || '',
-        customerContact: result.customer_contact || '',
-        items: result.items,
-        paymentStatus: result.payment_status,
-        profit: result.profit,
-        date: new Date(result.date),
-        taxRate: result.tax_rate,
-        cashTransactionId: result.cash_transaction_id || undefined,
-        amountPaid: result.amount_paid ? Number(result.amount_paid) : undefined,
-        amountDue: result.amount_due ? Number(result.amount_due) : undefined,
-        notes: result.notes || ''
-      };
+      if (initialData) {
+        const result = await dataStore.updateSale(initialData.id, {
+            ...formData,
+            date: selectedDate,
+            profit,
+            receiptNumber,
+            cashTransactionId: finalCashTransactionId
+        });
+        if (!result) throw new Error('Failed to update sale');
+        sale = result;
+      } else {
+        const newSale: Sale = {
+            id: `sale-${Date.now()}`,
+            receiptNumber,
+            customerName: formData.customerName,
+            customerAddress: formData.customerAddress,
+            customerContact: formData.customerContact,
+            items: formData.items,
+            paymentStatus: formData.paymentStatus,
+            profit,
+            date: selectedDate,
+            taxRate: formData.taxRate,
+            cashTransactionId: finalCashTransactionId || undefined,
+            amountPaid: formData.amountPaid,
+            amountDue: formData.amountDue,
+            notes: formData.notes,
+            createdAt: new Date(),
+            categoryId: formData.categoryId
+        };
+        const result = await dataStore.createSale(newSale);
+        sale = result;
+      }
 
       // Handle inventory, payments, etc.
       if (initialData) {
@@ -325,7 +340,7 @@ const SalesForm: React.FC<SalesFormProps> = ({
       } else {
         const newCashId = await createCashTransactionForSale(sale, grandTotal, linkToCash, selectedCashAccountId, selectedDate, formData.paymentStatus);
         if (newCashId) {
-          await (supabase as any).from('sales').update({ cash_transaction_id: newCashId }).eq('id', sale.id);
+          await dataStore.updateSale(sale.id, { cashTransactionId: newCashId });
           sale.cashTransactionId = newCashId;
         }
         if (formData.paymentStatus === 'Installment Sale' && formData.amountPaid) {
@@ -382,7 +397,7 @@ const SalesForm: React.FC<SalesFormProps> = ({
       setIsSubmitted(true);
 
       if (!onSaleComplete) {
-        navigate('/sales');
+        router.push('/sales');
       }
 
     } catch (error: any) {
@@ -482,7 +497,7 @@ const SalesForm: React.FC<SalesFormProps> = ({
       <SaleFormActions
         loading={loading}
         isEditing={!!initialData}
-        onCancel={() => navigate('/sales')}
+        onCancel={() => router.push('/sales')}
         onClearForm={!initialData ? handleClearForm : undefined}
         printAfterSave={printAfterSave}
         onPrintAfterSaveChange={setPrintAfterSave}

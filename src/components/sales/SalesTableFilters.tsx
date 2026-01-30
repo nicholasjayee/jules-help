@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Search, Filter, Tag } from 'lucide-react';
 import DateRangeFilter from './DateRangeFilter';
-import { useSalesCategories } from '@/hooks/useSalesCategories';
+import { useSalesCategories } from '@/components/hooks/useSalesCategories';
 
 interface SalesTableFiltersProps {
   searchQuery: string;

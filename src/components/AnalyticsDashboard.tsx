@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
-import { Sale, BusinessSettings, Product } from '@/types';
-import { useAnalyticsData } from '@/hooks/useAnalyticsData';
+import { Sale, BusinessSettings, Product } from '@/components/types';
+import { useAnalyticsData } from '@/components/hooks/useAnalyticsData';
 import { formatNumber } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import DateRangeFilter from './analytics/DateRangeFilter';
 import AnalyticsCards from './analytics/AnalyticsCards';
 import FinancialOverview from './analytics/FinancialOverview';
 import SalesGoalTracker from './SalesGoalTracker';
 import RecentSalesTable from './analytics/RecentSalesTable';
 import SalesPerformanceChart from './analytics/SalesPerformanceChart';
-import { useProductsBase } from '@/hooks/useProductsBase';
+import { useProductsBase } from '@/components/hooks/useProductsBase';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 interface AnalyticsDashboardProps {

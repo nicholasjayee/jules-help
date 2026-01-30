@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { InstallmentPayment } from '@/hooks/useInstallmentPayments';
+import { InstallmentPayment } from '@/components/hooks/useInstallmentPayments';
 
 export interface PaymentChange {
   id: string;

@@ -1,9 +1,10 @@
+
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/hooks/use-toast';
 
 export const useDashboardActions = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -18,13 +19,15 @@ export const useDashboardActions = () => {
     
     try {
       // Clear caches more efficiently for mobile
-      if ('caches' in window) {
+      if (typeof window !== 'undefined' && 'caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
       }
       
       // Clear sessionStorage
-      sessionStorage.clear();
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.clear();
+      }
       
       // Force complete reload from server
       setTimeout(() => {
@@ -43,8 +46,8 @@ export const useDashboardActions = () => {
   }, [toast]);
 
   const handleQuickCreate = useCallback((paymentStatus: 'Paid' | 'NOT PAID' | 'Quote' | 'Installment Sale') => {
-    navigate('/new-sale', { state: { defaultPaymentStatus: paymentStatus } });
-  }, [navigate]);
+    router.push(`/new-sale?defaultPaymentStatus=${paymentStatus}`);
+  }, [router]);
 
   return {
     isRefreshing,

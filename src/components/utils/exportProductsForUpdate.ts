@@ -1,5 +1,5 @@
 
-import { Product } from '@/types';
+import { Product } from '@/components/types';
 
 export const exportProductsForUpdate = (products: Product[]): void => {
   // Define CSV header - simplified for updates, no currency symbols

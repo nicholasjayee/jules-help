@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { WifiOff } from 'lucide-react';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useNetworkStatus } from '@/components/hooks/useNetworkStatus';
 
 const NetworkStatusIndicator = () => {
   const { isOnline } = useNetworkStatus();

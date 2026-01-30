@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { 
   Drawer, 
@@ -9,7 +9,7 @@ import {
   DrawerTrigger
 } from '@/components/ui/drawer';
 import PrintableReceipt from '@/components/PrintableReceipt';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import { X } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 

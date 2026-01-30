@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { SaleFormData } from '@/types';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { SaleFormData } from '@/components/types';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 export const useSaleDraft = () => {
   const [hasDraft, setHasDraft] = useState(false);

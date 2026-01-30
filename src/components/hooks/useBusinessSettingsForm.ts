@@ -5,7 +5,7 @@ import {
   parsePaymentInfo,
   convertPaymentMethodsToString,
   BusinessSettings
-} from '@/hooks/useBusinessSettings';
+} from '@/components/hooks/useBusinessSettings';
 
 interface PaymentMethod {
   method: string;

@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Product, DbProduct, mapDbProductToProduct } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { Product, DbProduct, mapDbProductToProduct } from '@/components/types';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 /**
  * Base hook for fetching and storing products

@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
-import { DeletedSale } from '@/hooks/useDeletedSales';
+import { DeletedSale } from '@/components/hooks/useDeletedSales';
 import { Trash2, User, Clock, Package } from 'lucide-react';
 
 interface DeletedSalesTableProps {

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Product } from '@/types';
-import { Sale } from '@/types';
+import { Product } from '@/components/types';
+import { Sale } from '@/components/types';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 export const useInventoryData = (

@@ -1,6 +1,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import { getDateRangeFromFilter } from '@/utils/dateFilters';
 import { isSameDay } from 'date-fns';
 

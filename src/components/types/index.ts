@@ -626,3 +626,12 @@ export const mapExpenseToDbExpense = (expense: Partial<Expense>, userId: string)
 
   return result;
 };
+
+export interface BusinessLocation {
+  id: string;
+  name: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  switch_password_hash?: string;
+}

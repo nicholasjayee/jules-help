@@ -8,9 +8,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Sale } from '@/types';
-import { useSalesCategories } from '@/hooks/useSalesCategories';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Sale } from '@/components/types';
+import { useSalesCategories } from '@/components/hooks/useSalesCategories';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import { TrendingUp, DollarSign, ShoppingCart, Trophy, Target, Edit2, Trash2, Plus, Check, X, Settings, CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, isAfter, isBefore, isEqual, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subDays, subWeeks, subMonths, subYears } from 'date-fns';

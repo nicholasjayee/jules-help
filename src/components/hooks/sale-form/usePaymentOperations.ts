@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { useInstallmentPayments } from '@/hooks/useInstallmentPayments';
-import { useLocalPaymentChanges } from '@/hooks/useLocalPaymentChanges';
+import { useInstallmentPayments } from '@/components/hooks/useInstallmentPayments';
+import { useLocalPaymentChanges } from '@/components/hooks/useLocalPaymentChanges';
 
 interface UsePaymentOperationsProps {
   initialDataId?: string;

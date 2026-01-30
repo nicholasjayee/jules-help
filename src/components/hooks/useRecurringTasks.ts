@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Task } from '@/types/task';
+import { Task } from '@/components/types/task';
 import { addDays, addWeeks, addMonths, format, parseISO } from 'date-fns';
 import { toast } from 'sonner';
 

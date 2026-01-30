@@ -8,12 +8,12 @@ import SalesDataTable from './SalesDataTable';
 import SalesReceiptDialog from './SalesReceiptDialog';
 import SalesCategoryAnalysis from './SalesCategoryAnalysis';
 import { DeletedSalesTable } from './DeletedSalesTable';
-import { useSalesData } from '@/hooks/useSalesData';
-import { useDeletedSales } from '@/hooks/useDeletedSales';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useSalesActions } from '@/hooks/useSalesActions';
+import { useSalesData } from '@/components/hooks/useSalesData';
+import { useDeletedSales } from '@/components/hooks/useDeletedSales';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useCurrentUser } from '@/components/hooks/useCurrentUser';
+import { useSalesActions } from '@/components/hooks/useSalesActions';
 import { RefreshCw, History, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

@@ -4,13 +4,13 @@ import { TableRow, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Printer, Edit, Trash2, FileText, Heart, MessageSquare } from 'lucide-react';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import { formatNumber } from '@/lib/utils';
-import { useCashAccounts } from '@/hooks/useCashAccounts';
-import { useCashTransactions } from '@/hooks/useCashTransactions';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useCashAccounts } from '@/components/hooks/useCashAccounts';
+import { useCashTransactions } from '@/components/hooks/useCashTransactions';
+import { useIsMobile } from '@/components/hooks/use-mobile';
 import { canSendSMS } from '@/utils/smsUtils';
-import { useInstallmentPayments } from '@/hooks/useInstallmentPayments';
+import { useInstallmentPayments } from '@/components/hooks/useInstallmentPayments';
 
 interface SalesTableRowProps {
   sale: Sale;

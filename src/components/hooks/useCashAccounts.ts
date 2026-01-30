@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CashAccount, CashTransaction } from '@/types/cash';
+import { CashAccount, CashTransaction } from '@/components/types/cash';
 
 export const useCashAccounts = () => {
   const [accounts, setAccounts] = useState<CashAccount[]>([]);

@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { formatNumber } from "@/lib/utils";
 import { numberToWords } from "@/utils/numberToWords";
-import { parsePaymentInfo } from "@/hooks/useBusinessSettings";
+import { parsePaymentInfo } from "@/components/hooks/useBusinessSettings";
 
 // Helpers
 function padRight(text: string, width: number) {
