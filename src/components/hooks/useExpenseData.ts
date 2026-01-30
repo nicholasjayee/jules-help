@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
 import { formatCashCurrency } from '@/lib/utils';
-import { Expense } from '@/hooks/useExpenses';
+import { Expense } from '@/components/hooks/useExpenses';
 import { getDateRangeFromFilter, isDateInRange } from '@/utils/dateFilters';
 
 export const useExpenseData = (

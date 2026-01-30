@@ -10,7 +10,7 @@ import BusinessProfileForm from '@/components/settings/BusinessProfileForm';
 import PaymentMethodsManager from '@/components/settings/PaymentMethodsManager';
 import SignatureManager from '@/components/settings/SignatureManager';
 import PrivacySettings from '@/components/settings/PrivacySettings';
-import { useBusinessSettingsForm } from '@/hooks/useBusinessSettingsForm';
+import { useBusinessSettingsForm } from '@/components/hooks/useBusinessSettingsForm';
 
 
 const BusinessSettings = () => {

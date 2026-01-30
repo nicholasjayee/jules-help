@@ -1,5 +1,5 @@
 
-import { Product, BusinessSettings } from '@/types';
+import { Product, BusinessSettings } from '@/components/types';
 
 export const exportProductsToCSV = (products: Product[]): void => {
   // Get currency from business settings

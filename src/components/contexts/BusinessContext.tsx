@@ -1,18 +1,9 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusinessPassword } from '@/hooks/useBusinessPassword';
-
-
-export interface BusinessLocation {
-  id: string;
-  name: string;
-  is_default: boolean;
-  created_at: string;
-  updated_at: string;
-  switch_password_hash?: string;
-}
+import { useBusinessPassword } from '@/components/hooks/useBusinessPassword';
+import { dataStore } from '@/lib/dataStore';
+import { BusinessLocation } from '@/components/types/index';
 
 interface BusinessContextType {
   currentBusiness: BusinessLocation | null;
@@ -45,7 +36,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [error, setError] = useState<string | null>(null);
   const { isBusinessVerified } = useBusinessPassword();
 
-
   const loadBusinessLocations = async () => {
     if (!user) {
       setIsLoading(false);
@@ -59,25 +49,14 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setIsLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('business_locations')
-        .select('id, name, user_id, is_default, created_at, updated_at, switch_password_hash')
-        .eq('user_id', user.id)
-        .order('is_default', { ascending: false })
-        .order('name');
-
-      if (fetchError) {
-        console.error('Error loading business locations:', fetchError);
-        setError('Failed to load business locations');
-        throw fetchError;
-      }
+      const data = await dataStore.getBusinessLocations(user.id);
 
       setBusinessLocations(data || []);
 
       // Always try to set a current business if we have locations
       if (data && data.length > 0) {
         // First check localStorage for saved business
-        const savedBusinessId = localStorage.getItem('currentBusinessId');
+        const savedBusinessId = typeof window !== 'undefined' ? localStorage.getItem('currentBusinessId') : null;
         let businessToSet = data.find(b => b.id === savedBusinessId);
 
         // If no saved business or saved business not found, use default or first
@@ -87,12 +66,16 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         if (businessToSet) {
           setCurrentBusiness(businessToSet);
-          localStorage.setItem('currentBusinessId', businessToSet.id);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('currentBusinessId', businessToSet.id);
+          }
         }
       } else {
         // No business locations found, clear current business
         setCurrentBusiness(null);
-        localStorage.removeItem('currentBusinessId');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('currentBusinessId');
+        }
       }
     } catch (error) {
       console.error('Error loading business locations:', error);
@@ -138,31 +121,15 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     try {
-      const { data, error } = await supabase
-        .from('business_locations')
-        .insert({
-          user_id: user.id,
-          name: name.trim(),
-          is_default: businessLocations.length === 0 // Make first business default
-        })
-        .select()
-        .single();
+      const newBusiness = await dataStore.createBusiness({
+        id: `loc-${Date.now()}`,
+        name: name.trim(),
+        is_default: businessLocations.length === 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      });
 
-      if (error) {
-        console.error('Error creating business:', error);
-        throw error;
-      }
-
-      if (data) {
-        const newBusiness: BusinessLocation = {
-          id: data.id,
-          name: data.name,
-          is_default: data.is_default,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          switch_password_hash: data.switch_password_hash
-        };
-
+      if (newBusiness) {
         setBusinessLocations(prev => [...prev, newBusiness]);
 
         // If this is the first business or it's set as default, make it current
@@ -185,26 +152,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!user) return false;
 
     try {
-      const { data, error } = await supabase
-        .from('business_locations')
-        .update({ name })
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single();
+      const updatedBusiness = await dataStore.updateBusiness(id, { name });
 
-      if (error) throw error;
-
-      if (data) {
-        const updatedBusiness: BusinessLocation = {
-          id: data.id,
-          name: data.name,
-          is_default: data.is_default,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          switch_password_hash: data.switch_password_hash
-        };
-
+      if (updatedBusiness) {
         setBusinessLocations(prev => prev.map(b => b.id === id ? updatedBusiness : b));
 
         if (currentBusiness?.id === id) {
@@ -225,13 +175,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!user) return false;
 
     try {
-      const { error } = await supabase
-        .from('business_locations')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
+      const success = await dataStore.deleteBusiness(id);
+      if (!success) throw new Error("Failed to delete");
 
       setBusinessLocations(prev => prev.filter(b => b.id !== id));
 
@@ -263,15 +208,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     try {
-      const { data, error } = await supabase.rpc('reset_business_location', {
-        location_uuid: id,
-        user_uuid: user.id
-      });
-
-      if (error) {
-        console.error('Error from reset function:', error);
-        throw error;
-      }
+      // Mock reset
+      await new Promise(r => setTimeout(r, 500));
 
       // Reload business locations to refresh the data
       await loadBusinessLocations();
@@ -291,7 +229,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setBusinessLocations([]);
       setIsLoading(false);
       setError(null);
-      localStorage.removeItem('currentBusinessId');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('currentBusinessId');
+      }
     }
   }, [user?.id]);
 

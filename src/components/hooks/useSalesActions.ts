@@ -1,16 +1,18 @@
+
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Sale } from '@/types';
+import { useRouter } from 'next/navigation';
+import { Sale } from '@/components/types/index';
 
 export const useSalesActions = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [isReceiptDialogOpen, setIsReceiptDialogOpen] = useState(false);
   const [isDeletingSale, setIsDeletingSale] = useState(false);
 
   const handleEditSale = useCallback((sale: Sale) => {
-    navigate('/new-sale', { state: { editSale: sale } });
-  }, [navigate]);
+    // Pass ID via query param
+    router.push(`/new-sale?id=${sale.id}`);
+  }, [router]);
 
   const handleViewReceipt = useCallback((sale: Sale) => {
     setSelectedSale(sale);

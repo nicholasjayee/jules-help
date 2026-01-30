@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { formatNumber, formatNumberInput, parseNumberInput, cn } from '@/lib/utils';
-import { InstallmentPayment } from '@/hooks/useInstallmentPayments';
-import { PaymentChange } from '@/hooks/useLocalPaymentChanges';
+import { InstallmentPayment } from '@/components/hooks/useInstallmentPayments';
+import { PaymentChange } from '@/components/hooks/useLocalPaymentChanges';
 import InstallmentPaymentHistory from './InstallmentPaymentHistory';
 
 interface InstallmentPaymentInputProps {

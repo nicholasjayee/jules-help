@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Product, SaleItem } from '@/types';
+import { Product, SaleItem } from '@/components/types';
 import { useProducts } from './useProducts';
 import { useInventoryActions } from './useInventoryActions';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 export const useSaleProductSelection = (userId: string | undefined) => {
   const { products } = useProducts(userId);

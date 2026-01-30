@@ -1,24 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { dataStore } from '@/lib/dataStore';
+import { BusinessSettings } from '@/components/types/index';
 
-export interface BusinessSettings {
-  id?: string;
-  businessName: string;
-  businessAddress: string;
-  businessPhone: string;
-  businessEmail: string;
-  businessLogo?: string;
-  currency: string;
-  signature?: string;
-  paymentInfo?: string;
-  defaultPrintFormat?: 'standard' | 'thermal';
-}
-
-// Utility function to parse payment info text into structured format
 export const parsePaymentInfo = (paymentInfo: string): { method: string, accountNumber: string, accountName: string }[] => {
   if (!paymentInfo || paymentInfo.trim() === '') {
     return [];
@@ -40,7 +27,6 @@ export const parsePaymentInfo = (paymentInfo: string): { method: string, account
   return methods;
 };
 
-// Utility function to convert payment methods array back to string format
 export const convertPaymentMethodsToString = (paymentMethods: { method: string, accountNumber: string, accountName: string }[]): string => {
   return paymentMethods
     .filter(pm => pm.method.trim() !== '' || pm.accountNumber.trim() !== '' || pm.accountName.trim() !== '')
@@ -48,7 +34,6 @@ export const convertPaymentMethodsToString = (paymentMethods: { method: string, 
     .join('\n');
 };
 
-// Default settings for new businesses
 const getDefaultSettings = (): BusinessSettings => ({
   businessName: 'Your Business Name',
   businessAddress: 'Your Business Address',
@@ -71,37 +56,8 @@ export const useBusinessSettings = () => {
     }
 
     try {
-      const { data, error } = await (supabase
-        .from('business_settings' as any)
-        .select('*')
-        .eq('location_id', currentBusiness.id)
-        .maybeSingle()) as { data: any, error: any };
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading business settings:', error);
-        throw error;
-      }
-
-      if (data) {
-        // Extract payment info from metadata
-        const paymentInfo = data.metadata && typeof data.metadata === 'object' ?
-          (data.metadata as Record<string, unknown>).payment_info as string || '' : '';
-
-        return {
-          id: data.id,
-          businessName: data.business_name,
-          businessAddress: data.business_address,
-          businessPhone: data.business_phone,
-          businessEmail: data.business_email,
-          businessLogo: data.business_logo,
-          currency: data.currency,
-          signature: data.signature,
-          paymentInfo: paymentInfo,
-          defaultPrintFormat: data.metadata && typeof data.metadata === 'object' ?
-            (data.metadata as Record<string, unknown>).default_print_format as 'standard' | 'thermal' || 'standard' : 'standard'
-        };
-      } else {
-        return getDefaultSettings();
-      }
+      const data = await dataStore.getBusinessSettings(currentBusiness.id);
+      return data || getDefaultSettings();
     } catch (error) {
       console.error('Error loading business settings:', error);
       toast({
@@ -125,52 +81,14 @@ export const useBusinessSettings = () => {
     }
 
     try {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) {
-        console.error('User not authenticated');
-        throw new Error('User not authenticated');
-      }
-
-      // Prepare the metadata object with payment info
-      const metadata = {
-        payment_info: newSettings.hasOwnProperty('paymentInfo') ? newSettings.paymentInfo : settings.paymentInfo || '',
-        default_print_format: newSettings.hasOwnProperty('defaultPrintFormat') ? newSettings.defaultPrintFormat : settings.defaultPrintFormat || 'standard'
-      };
-
-      const updateData = {
-        user_id: userData.user.id,
-        location_id: currentBusiness.id,
-        business_name: newSettings.hasOwnProperty('businessName') ? newSettings.businessName : settings.businessName,
-        business_address: newSettings.hasOwnProperty('businessAddress') ? newSettings.businessAddress : settings.businessAddress,
-        business_phone: newSettings.hasOwnProperty('businessPhone') ? newSettings.businessPhone : settings.businessPhone,
-        business_email: newSettings.hasOwnProperty('businessEmail') ? newSettings.businessEmail : settings.businessEmail,
-        business_logo: newSettings.hasOwnProperty('businessLogo') ? newSettings.businessLogo : settings.businessLogo,
-        currency: newSettings.hasOwnProperty('currency') ? newSettings.currency : settings.currency,
-        signature: newSettings.hasOwnProperty('signature') ? newSettings.signature : settings.signature,
-        metadata: metadata
-      };
-
-      const { data, error } = await (supabase
-        .from('business_settings' as any)
-        .upsert(updateData, {
-          onConflict: 'location_id'
-        })
-        .select()
-        .single()) as { data: any, error: any };
-
-      if (error) {
-        console.error('Supabase error updating business settings:', error);
-        throw error;
-      }
+      await dataStore.updateBusinessSettings(currentBusiness.id, newSettings);
 
       toast({
         title: "Success",
         description: "Business settings updated successfully"
       });
 
-      // Refetch settings after update
       refetch();
-
       return true;
     } catch (error) {
       console.error('Error updating business settings:', error);
@@ -183,18 +101,12 @@ export const useBusinessSettings = () => {
     }
   };
 
-  // React Query for settings loading with proper caching
   const { data: queriedData, isLoading: isQueryLoading, isFetching, refetch } = useQuery({
     queryKey: ['businessSettings', currentBusiness?.id],
     queryFn: loadSettings,
     enabled: !!currentBusiness?.id,
-    staleTime: 5 * 60_000,
-    gcTime: 30 * 60_000,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
   });
 
-  // Sync React Query data with local state
   useEffect(() => {
     if (queriedData) {
       setSettings(queriedData);
@@ -203,7 +115,6 @@ export const useBusinessSettings = () => {
     }
   }, [queriedData, currentBusiness]);
 
-  // Sync loading state from React Query
   useEffect(() => {
     setIsLoading(isQueryLoading || isFetching);
   }, [isQueryLoading, isFetching]);
@@ -215,3 +126,6 @@ export const useBusinessSettings = () => {
     loadSettings
   };
 };
+
+// Re-export interface if needed, though it's in types/index.ts
+export type { BusinessSettings } from '@/components/types/index';

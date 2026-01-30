@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Customer } from "@/types";
+import { Customer } from "@/components/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCustomerCategories } from "@/hooks/useCustomerCategories";
+import { useCustomerCategories } from "@/components/hooks/useCustomerCategories";
 
 interface CustomerInformationProps {
   customerName: string;

@@ -1,14 +1,17 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { CashAccount } from '@/types/cash';
+import { useRouter } from 'next/navigation';
+import { CashAccount } from '@/components/types/cash';
 
 export const useCashAccountRedirect = (accounts: CashAccount[]) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [hasCheckedRedirect, setHasCheckedRedirect] = useState(false);
 
   // Check for last visited cash account and redirect if found
   useEffect(() => {
     if (!hasCheckedRedirect && accounts.length > 0) {
+      if (typeof window === 'undefined') return;
+
       const lastVisitedAccountId = localStorage.getItem('lastVisitedCashAccount');
       const lastVisitedUrl = localStorage.getItem('lastVisitedCashAccountUrl');
       
@@ -17,7 +20,8 @@ export const useCashAccountRedirect = (accounts: CashAccount[]) => {
         const accountExists = accounts.some(acc => acc.id === lastVisitedAccountId);
         if (accountExists) {
           // Use the complete URL to preserve filters and pagination
-          navigate(lastVisitedUrl.replace(window.location.origin, ''));
+          const path = lastVisitedUrl.replace(window.location.origin, '');
+          router.push(path);
           return;
         } else {
           // Clean up invalid stored account data
@@ -27,7 +31,7 @@ export const useCashAccountRedirect = (accounts: CashAccount[]) => {
       }
       setHasCheckedRedirect(true);
     }
-  }, [accounts, hasCheckedRedirect, navigate]);
+  }, [accounts, hasCheckedRedirect, router]);
 
   return { hasCheckedRedirect };
 };

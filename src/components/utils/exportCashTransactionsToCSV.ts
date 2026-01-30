@@ -1,5 +1,5 @@
 
-import { CashTransaction } from '@/types/cash';
+import { CashTransaction } from '@/components/types/cash';
 import { format } from 'date-fns';
 
 export const exportCashTransactionsToCSV = (

@@ -7,8 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useSalesCategories } from '@/hooks/useSalesCategories';
-import { SalesCategory } from '@/types';
+import { useSalesCategories } from '@/components/hooks/useSalesCategories';
+import { SalesCategory } from '@/components/types';
 
 interface SaleCategorySelectorProps {
   value?: string;

@@ -1,8 +1,8 @@
 // hooks/useMessages.ts
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useProfiles } from '@/contexts/ProfileContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useProfiles } from '@/components/contexts/ProfileContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface Message {

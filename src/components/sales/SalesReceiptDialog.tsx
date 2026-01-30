@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 import ReceiptDialog from './ReceiptDialog';
 
 interface SalesReceiptDialogProps {

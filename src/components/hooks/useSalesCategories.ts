@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { SalesCategory } from '@/types';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { toast } from '@/hooks/use-toast';
+import { SalesCategory } from '@/components/types';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { toast } from '@/components/hooks/use-toast';
 import { useAuth } from '@/components/auth/AuthProvider';
 
 export const useSalesCategories = () => {

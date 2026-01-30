@@ -13,7 +13,7 @@ import NavLinks from './header/NavLinks';
 import { Building2, LogOut } from 'lucide-react';
 import { BusinessSelector } from './business/BusinessSelector';
 import { ProfileSelector } from './profiles/ProfileSelector';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { toast } from 'sonner';
 

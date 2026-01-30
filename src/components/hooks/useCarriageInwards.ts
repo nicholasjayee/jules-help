@@ -2,8 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useToast } from '@/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useToast } from '@/components/hooks/use-toast';
 
 export interface CarriageInward {
   id: string;

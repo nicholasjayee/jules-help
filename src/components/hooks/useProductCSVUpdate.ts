@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
+import { useToast } from '@/components/hooks/use-toast';
+import { useProducts } from '@/components/hooks/useProducts';
+import { useCategories } from '@/components/hooks/useCategories';
 import { CSVProductUpdateRow } from '@/utils/csvUpdateParser';
-import { Product } from '@/types';
+import { Product } from '@/components/types';
 
 export interface ProductUpdateData {
   productId: string;

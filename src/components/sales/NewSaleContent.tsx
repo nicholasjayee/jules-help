@@ -3,7 +3,7 @@ import SalesForm from '@/components/SalesForm';
 import ReceiptDialog from '@/components/sales/ReceiptDialog';
 import NewCustomerDialog from '@/components/customers/NewCustomerDialog';
 import DraftNotification from '@/components/sales/DraftNotification';
-import { Sale } from '@/types';
+import { Sale } from '@/components/types';
 
 interface NewSaleContentProps {
   editSale?: Sale;

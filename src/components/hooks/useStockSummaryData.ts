@@ -1,5 +1,5 @@
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 

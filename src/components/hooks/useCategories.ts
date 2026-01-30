@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ProductCategory, DbProductCategory, mapDbProductCategoryToProductCategory } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { ProductCategory, DbProductCategory, mapDbProductCategoryToProductCategory } from '@/components/types';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 export const useCategories = (userId: string | undefined) => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);

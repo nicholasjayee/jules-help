@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { FileDown, FileText, Plus } from 'lucide-react';
 import { exportToCSV } from '@/utils/exportToCSV';
 import { generateSalesReportVectorPDF } from '@/utils/generateSalesReportVectorPDF';
-import { Sale } from '@/types';
-import { useToast } from '@/hooks/use-toast';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
+import { Sale } from '@/components/types';
+import { useToast } from '@/components/hooks/use-toast';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
 import { format } from 'date-fns';
 import { getDateRangeFromFilter } from '@/utils/dateFilters';
 

@@ -1,4 +1,4 @@
-import { SaleItem } from '@/types';
+import { SaleItem } from '@/components/types';
 
 /**
  * Calculate the actual amount for a sale item after applying discounts

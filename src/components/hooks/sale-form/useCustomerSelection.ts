@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { SaleFormData, Customer } from '@/types';
+import { SaleFormData, Customer } from '@/components/types';
 
 interface UseCustomerSelectionProps {
   setFormData: React.Dispatch<React.SetStateAction<SaleFormData>>;

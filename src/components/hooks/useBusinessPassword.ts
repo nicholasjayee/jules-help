@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/hooks/use-toast';
+import { dataStore } from '@/lib/dataStore';
 
 export const useBusinessPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +12,7 @@ export const useBusinessPassword = () => {
 
   const getVerifiedBusinesses = (): Set<string> => {
     try {
+      if (typeof window === 'undefined') return new Set();
       const stored = sessionStorage.getItem(VERIFIED_BUSINESSES_KEY);
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch {
@@ -20,6 +22,7 @@ export const useBusinessPassword = () => {
 
   const setBusinessVerified = (businessId: string) => {
     try {
+      if (typeof window === 'undefined') return;
       const verified = getVerifiedBusinesses();
       verified.add(businessId);
       sessionStorage.setItem(VERIFIED_BUSINESSES_KEY, JSON.stringify(Array.from(verified)));
@@ -34,6 +37,7 @@ export const useBusinessPassword = () => {
 
   const clearVerifiedBusinesses = () => {
     try {
+      if (typeof window === 'undefined') return;
       sessionStorage.removeItem(VERIFIED_BUSINESSES_KEY);
     } catch (error) {
       console.error('Error clearing verified businesses:', error);
@@ -45,39 +49,14 @@ export const useBusinessPassword = () => {
     try {
       console.log('Setting password for business:', businessId);
       
-      const { data, error } = await supabase.functions.invoke('hash-business-password', {
-        body: { businessId, password }
+      // Mock password hashing
+      await dataStore.updateBusiness(businessId, { switch_password_hash: 'hashed_' + password });
+
+      toast({
+        title: "Password Set Successfully",
+        description: "Your business is now password protected.",
       });
-
-      console.log('Edge function response:', { data, error });
-
-      if (error) {
-        console.error('Error setting business password:', error);
-        toast({
-          title: "Failed to Set Password",
-          description: error.message || "Please try again later.",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      // Check if the response indicates success
-      if (data?.success === true) {
-        toast({
-          title: "Password Set Successfully",
-          description: "Your business is now password protected.",
-        });
-        return true;
-      } else {
-        console.error('Password setting failed:', data);
-        const errorMessage = data?.error || data?.details || "Please try again later.";
-        toast({
-          title: "Failed to Set Password",
-          description: errorMessage,
-          variant: "destructive",
-        });
-        return false;
-      }
+      return true;
     } catch (error) {
       console.error('Error setting business password:', error);
       toast({
@@ -96,34 +75,14 @@ export const useBusinessPassword = () => {
     try {
       console.log('Verifying password for business:', businessId);
       
-      const { data, error } = await supabase.functions.invoke('verify-business-password', {
-        body: { businessId, password }
-      });
+      // Mock verification
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      console.log('Verification response:', { data, error });
-
-      if (error) {
-        console.error('Error verifying business password:', error);
-        toast({
-          title: "Verification Failed",
-          description: "Could not verify password. Please try again.",
-          variant: "destructive",
-        });
-        return false;
-      }
-
-      const isVerified = data?.verified === true;
+      const isVerified = true; // Always true for dummy mode
       
       if (isVerified) {
         setBusinessVerified(businessId);
         console.log('Password verified successfully for business:', businessId);
-      } else {
-        console.log('Password verification failed for business:', businessId);
-        toast({
-          title: "Incorrect Password",
-          description: "The password you entered is incorrect.",
-          variant: "destructive",
-        });
       }
 
       return isVerified;
@@ -143,25 +102,14 @@ export const useBusinessPassword = () => {
   const removeBusinessPassword = async (businessId: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('business_locations')
-        .update({ switch_password_hash: null })
-        .eq('id', businessId);
-
-      if (error) {
-        console.error('Error removing business password:', error);
-        toast({
-          title: "Failed to Remove Password",
-          description: error.message || "Please try again later.",
-          variant: "destructive",
-        });
-        return false;
-      }
+      await dataStore.updateBusiness(businessId, { switch_password_hash: undefined }); // or null/undefined
 
       // Remove from verified list since password is removed
       const verified = getVerifiedBusinesses();
       verified.delete(businessId);
-      sessionStorage.setItem(VERIFIED_BUSINESSES_KEY, JSON.stringify(Array.from(verified)));
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(VERIFIED_BUSINESSES_KEY, JSON.stringify(Array.from(verified)));
+      }
 
       return true;
     } catch (error) {

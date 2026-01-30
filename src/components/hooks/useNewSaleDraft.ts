@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useSaleDraft } from '@/hooks/useSaleDraft';
-import { Sale } from '@/types';
+import { useSaleDraft } from '@/components/hooks/useSaleDraft';
+import { Sale } from '@/components/types';
 
 export const useNewSaleDraft = (editSale?: Sale) => {
   const [showDraftNotification, setShowDraftNotification] = useState(false);

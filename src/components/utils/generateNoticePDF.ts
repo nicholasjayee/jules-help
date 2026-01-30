@@ -1,8 +1,8 @@
 
 import jsPDF from 'jspdf';
 import { format } from 'date-fns';
-import { BusinessSettings } from '@/hooks/useBusinessSettings';
-import { Customer } from '@/types';
+import { BusinessSettings } from '@/components/hooks/useBusinessSettings';
+import { Customer } from '@/components/types';
 
 interface NoticeData {
   customer: Customer;

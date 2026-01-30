@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2 } from 'lucide-react';
-import { SaleItem } from '@/types';
+import { SaleItem } from '@/components/types';
 import { formatNumber } from '@/lib/utils';
-import { useBusinessSettings } from '@/hooks/useBusinessSettings';
+import { useBusinessSettings } from '@/components/hooks/useBusinessSettings';
 
 interface SaleItemInputProps {
   item: SaleItem;

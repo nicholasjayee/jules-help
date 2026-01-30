@@ -1,9 +1,9 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
-import { ProductFormData } from '@/types';
+import { useProducts } from '@/components/hooks/useProducts';
+import { useCategories } from '@/components/hooks/useCategories';
+import { ProductFormData } from '@/components/types';
 import { toast } from 'sonner';
 
 export const useBulkProducts = () => {

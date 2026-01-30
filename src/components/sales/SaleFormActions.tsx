@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { useBusiness } from "@/contexts/BusinessContext";
-import { useBusinessSettings } from "@/hooks/useBusinessSettings";
+import { useBusiness } from "@/components/contexts/BusinessContext";
+import { useBusinessSettings } from "@/components/hooks/useBusinessSettings";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, MessageSquare } from "lucide-react";
-import { useMessages } from "@/hooks/useMessages";
+import { useMessages } from "@/components/hooks/useMessages";
 import {
   Select,
   SelectTrigger,

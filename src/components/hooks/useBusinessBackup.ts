@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 import { toast } from 'sonner';
 
 interface BackupMetadata {

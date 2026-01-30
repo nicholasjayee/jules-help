@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
 import SaleDatePicker from '@/components/sales/SaleDatePicker';
 import CustomerInformation from '@/components/sales/CustomerInformation';
-import { Customer, FormErrors } from '@/types';
+import { Customer, FormErrors } from '@/components/types';
 
 interface SaleFormHeaderProps {
   isEditing: boolean;

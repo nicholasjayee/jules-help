@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import SaleItems from '@/components/sales/SaleItems';
 import TaxRateInput from '@/components/sales/TaxRateInput';
 import SaleTotals from '@/components/sales/SaleTotals';
-import { SaleItem, FormErrors } from '@/types';
+import { SaleItem, FormErrors } from '@/components/types';
 
 interface SaleItemsManagerProps {
   items: SaleItem[];

@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useBusiness } from '@/contexts/BusinessContext';
-import { useSalesData } from '@/hooks/useSalesData';
-import { useExpenses } from '@/hooks/useExpenses';
-import { useStockSummaryData } from '@/hooks/useStockSummaryData';
-import { useCarriageInwards } from '@/hooks/useCarriageInwards';
+import { useBusiness } from '@/components/contexts/BusinessContext';
+import { useSalesData } from '@/components/hooks/useSalesData';
+import { useExpenses } from '@/components/hooks/useExpenses';
+import { useStockSummaryData } from '@/components/hooks/useStockSummaryData';
+import { useCarriageInwards } from '@/components/hooks/useCarriageInwards';
 import { getDateRangeFromFilter } from '@/utils/dateFilters';
 import { isSameDay } from 'date-fns';
 

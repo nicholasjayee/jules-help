@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { Product, ProductFilters } from '@/types';
-import { useBusiness } from '@/contexts/BusinessContext';
+import { Product, ProductFilters } from '@/components/types';
+import { useBusiness } from '@/components/contexts/BusinessContext';
 
 /**
  * Hook for filtering products based on search, category, and stock status
